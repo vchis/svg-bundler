@@ -18,5 +18,8 @@
   "homepage": "https://github.com/vchis/svg-bundler#readme",
   "bin": {
     "svg-bundler": "./svg-bundler.js"
+  },
+  "dependencies": {
+    "xmldom": "^0.1.27"
   }
 }

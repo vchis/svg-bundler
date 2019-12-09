@@ -2,6 +2,9 @@
 
 const fs = require('fs');
 const path = require('path');
+const xmldom = require('xmldom');
+const parser = new xmldom.DOMParser();
+const serializer = new xmldom.XMLSerializer();
 
 function getFiles(root) {
   const stat = fs.statSync(root);
@@ -17,11 +20,16 @@ function getFiles(root) {
 
 function generateExports() {
 
+  if (process.argv.length < 4) {
+    usage();
+    return;
+  }
+
   const cmd = path.basename(process.argv[1]);
   const args = process.argv.slice(2);
 
   let output = process.stdout;
-  if (process.argv[4]) {
+  if (process.argv[3]) {
     output = fs.createWriteStream(process.argv[3]);
   }
 
@@ -36,12 +44,41 @@ function generateExports() {
   output.write(`export const resources = new Map<string, string>([\n`);
 
   files.forEach(fn => {
-    const relativePath = path.relative(process.argv[3], fn);
     const name = path.relative(process.argv[2], fn).slice(0, -4);
-    output.write(`  ['${name}', require('!!raw-loader!${relativePath}')],\n`);
+    // output.write(`  ['${name}', require('!!raw-loader!${relativePath}')],\n`);
+    output.write(`  ['${name}', ${loadFile(fn)}],\n`);
   });
 
   output.write(`]);\n`);
+}
+
+function loadFile(path) {
+  const content = fs.readFileSync(path, { encoding: 'utf8' });
+  const xml = parser.parseFromString(content, 'image/svg+xml')
+  const serialized = serializer.serializeToString(xml, false, (node) => {
+    const ignoredNodeTypes = [
+      8, // comments,
+      7, // processing instructions
+      10, // doctype
+    ]
+    if (ignoredNodeTypes.indexOf(node.nodeType) >= 0) return false;
+
+    // remove whitespace
+    if (node.nodeType === 3) {
+
+      const value = String(node.nodeValue).trim();
+      if (value === '') return false;
+    }
+
+    // filter title & description
+    const nodeNameFilter = ['title', 'desc'];
+    if (node.nodeType === 1 && nodeNameFilter.indexOf(node.tagName) >= 0) return false;
+    return node;
+  });
+
+  if (serialized.indexOf('`') >= 0)
+    return JSON.stringify(serialized);
+  return ['`', serialized.replace(/[\r\n]+/, ' '),  '`'].join('');
 }
 
 function usage() {
@@ -54,9 +91,5 @@ function usage() {
   console.log(`\nparam output:\n\tpath to the file in which the output should be; defaults to stdout\n`);
 }
 
-// usage();
 generateExports();
-
-// console.log(process.argv);
-// console.log(generateExports(process.argv[2], process.argv[3]));
 
