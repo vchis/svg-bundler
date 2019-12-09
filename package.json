@@ -1,0 +1,22 @@
+{
+  "name": "svg-bundler",
+  "version": "1.0.0",
+  "description": "bundles svg images in typescript files",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/vchis/svg-bundler.git"
+  },
+  "author": "Valeriu Dorin Chis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vchis/svg-bundler/issues"
+  },
+  "homepage": "https://github.com/vchis/svg-bundler#readme",
+  "bin": {
+    "svg-bundler": "./svg-bundler.js"
+  }
+}
