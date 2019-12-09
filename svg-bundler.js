@@ -20,7 +20,7 @@ function getFiles(root) {
 
 function generateExports() {
 
-  if (process.argv.length < 4) {
+  if (process.argv.length < 3) {
     usage();
     return;
   }
@@ -84,10 +84,6 @@ function loadFile(path) {
 function usage() {
   console.log(`Usage: ${path.basename(process.argv[1])} <input_directory> <output>`);
   console.log(`\nparam input_directory:\n\tpath to the folder in which the svg assets reside`);
-  console.log(`\nparam basepath:\n\tpath to folder relative to which the import paths should be;`);
-  console.log(`\tfor instance, if we load images from 'src/assets/images' but the system import`);
-  console.log(`\tpath is src, 'basepath' should be set to src so that the generated imports will`);
-  console.log(`\tlook like: !!raw-loader!/assets/... instead of !!raw-loader!/src/assets/...`);
   console.log(`\nparam output:\n\tpath to the file in which the output should be; defaults to stdout\n`);
 }
 
